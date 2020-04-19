@@ -1,0 +1,151 @@
+---
+title: "R Notebook"
+output: 
+  html_notebook:
+    toc: yes
+    toc_float: yes
+author: Manasa Kaushik
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+```{r}
+library(textreuse)
+library(lsa)
+options("digits"=3)
+```
+###2.1
+```{r}
+files <- list.files("~/Desktop/hw4.movies", full.names=T)
+corpus <- TextReuseCorpus(files, tokenizer = tokenize_ngrams, n = 5,
+                          keep_tokens = TRUE)
+```
+###2.1 (a)
+```{r}
+cols <- length(corpus)
+rows <- c()
+for(dnum in 1:cols){
+  shinglescount <- hashes(corpus[dnum])[[1]]
+  rows <- union(rows, shinglescount) 
+}
+
+rrec <- length(unique(unlist(rows),use.names = TRUE ))
+
+sprintf("Total number of rows: %d and total number of columns: %d",rrec, cols)
+```
+###2.1 (b)
+```{r}
+d <- corpus[["user20"]]
+dlength <- length(strsplit(d$content, "\n")[[1]])-1
+sprintf("This user has rated a total of %d movies", dlength)
+print("The first five shingles/tokens for this user are: ")
+head(d$tokens, 5)
+```
+
+```{r}
+pairs <- pairwise_candidates(pairwise_compare(corpus, jaccard_similarity, progress=interactive()))
+pairs
+```
+```{r}
+
+```
+###2.1 (c) (i) (ii) (iii) (iv)
+```{r}
+cat("Pairs of users having a similarity score of atleast 0.60: ", nrow(pairs[pairs$score*10 > .60, ]))
+cat("Pairs of users having a similarity score of atleast 0.50: ", nrow(pairs[pairs$score*10 > .50, ]))
+cat("Pairs of users having a similarity score of atleast 0.40: ", nrow(pairs[pairs$score*10 > .40, ]))
+pairs[pairs$score*10 > .40, ]
+```
+```{r}
+
+```
+###2.2 
+```{r}
+mk <- 20427459 %% 671
+paste("user", mk)
+```
+
+```{r}
+setwd("~/Desktop/HW4/ml-latest-small/")
+set.seed(100)
+mov <- read.csv("movies.csv", header=T, sep=",")
+msample <- sample(1:nrow(mov), 10)
+moviesample <- mov[msample, ]
+moviesample$movieId
+```
+```{r}
+
+```
+###User Profile
+```{r}
+uProfile <- read.csv("~/Desktop/HW4/uprofile.csv", header=T, sep=",")
+genres <- c("Action", "Adventure", "Animation", "Children", "Comedy", "Crime", "Documentary", "Drama", "Fantasy",
+"Film-Noir", "Horror", "IMAX", "Musical", "Mystery", "Romance", "Sci-Fi", "Thriller", "War", "Western")
+
+for (row in 1:nrow(uProfile)) {
+  genressub <- as.list(strsplit(toString(movies[mov$movieId == uProfile[row, ]$X, ]$genres),"[|]")[[1]])
+  for (g in genressub) {
+    uProfile[row, g] = 1
+  }
+}
+
+for (g in genres) {
+    print(sum(uProfile[, g]))
+    uProfile["avg", ] <- colMeans(uProfile)
+}
+
+uProfile <- uProfile[, 1:21]
+uProfile
+```
+```{r}
+
+```
+###Movie Profile
+```{r}
+mProfile <- read.csv("~/Desktop/HW4/mprofile.csv", header=T, sep=",")
+mgenres <- c("Action", "Adventure", "Animation", "Children", "Comedy", "Crime", "Documentary", "Drama", "Fantasy",
+"Film-Noir", "Horror", "IMAX", "Musical", "Mystery", "Romance", "Sci-Fi", "Thriller", "War", "Western")
+
+for (row in 1:nrow(mProfile)) {
+  mgensub <- as.list(strsplit(toString(mov[mov$movieId == mProfile[row, ]$X, ]$genres),"[|]")[[1]])
+  for (g in mgensub) {
+    mProfile[row, g] = 1
+  }
+}
+mProfile <- mProfile[, 1:21]
+mProfile
+```
+```{r}
+
+```
+### Cosine Similarities
+```{r}
+options("digits"=5)
+for(i in 1:nrow(mProfile)){
+  score <- lsa::cosine(as.numeric(userProfile["avg",-1]), as.numeric(mProfile[mProfile$X == mProfile[i,'X'],-1]))[[1]]
+
+movieID <- mProfile[mProfile$X == mProfile[i,'X'],1]
+title <- as.vector(mov[mov$movieId == movieID,"title"])[1]
+cat("Movie: ", title, ", Similarity score ", score , "\n")
+}
+```
+```{r}
+
+```
+###2.3
+```{r}
+files <- list.files("~/Desktop/hw4.movies", full.names=T)
+corpus <- TextReuseCorpus(files, tokenizer = tokenize_ngrams, n = 5,
+                          keep_tokens = TRUE)
+```
+```{r}
+
+```
+###2.3 (a)
+```{r}
+
+```
+
+
